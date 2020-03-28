@@ -1,0 +1,30 @@
+{
+  "name": "visualization-node",
+  "version": "0.0.1",
+  "description": "visualization node for Node-RED",
+  "main": "index.js",
+  "scripts": {
+    "build": "mkdir -p dist/nodes/ && cp -a src/nodes/*.html dist/nodes && tsc",
+    "start": "node index.js",
+    "watch": "tsc -watch",
+    "prestart": "tsc",
+    "prepublish": "npm run build",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "barriery",
+  "license": "Apache-2.0",
+  "node-red": {
+    "nodes": {
+      "lower-case": "dist/nodes/lower-case.js",
+      "markdown-template-render": "dist/nodes/markdown-template-render.js"
+    }
+  },
+  "devDependencies": {
+    "@types/node-red": "^0.20.1",
+    "node-red": "^1.0.4",
+    "typescript": "^3.8.3"
+  },
+  "dependencies": {
+    "axios": "^0.19.2"
+  }
+}
