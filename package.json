@@ -15,7 +15,6 @@
   "license": "Apache-2.0",
   "node-red": {
     "nodes": {
-      "lower-case": "dist/nodes/lower-case.js",
       "markdown-template-render": "dist/nodes/markdown-template-render.js"
     }
   },
@@ -25,6 +24,7 @@
     "typescript": "^3.8.3"
   },
   "dependencies": {
-    "axios": "^0.19.2"
+    "axios": "^0.19.2",
+    "vega": "^5.10.1"
   }
 }
