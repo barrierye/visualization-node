@@ -15,7 +15,8 @@
   "license": "Apache-2.0",
   "node-red": {
     "nodes": {
-      "markdown-template-render": "dist/nodes/markdown-template-render.js"
+      "markdown-template-render": "dist/nodes/markdown-template-render.js",
+      "chart-render": "dist/nodes/chart-render.js"
     }
   },
   "devDependencies": {
