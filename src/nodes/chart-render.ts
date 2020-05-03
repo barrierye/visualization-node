@@ -2,11 +2,11 @@ import {NodeProperties, Red} from 'node-red'
 import {Node} from 'node-red'
 
 interface ChartRenderProp extends NodeProperties {
-    type: string
+    chartType: string
 }
 
 interface ChartRenderNode extends Node {
-    type: string
+    chartType: string
 }
 
 interface ValueSpec {
@@ -152,6 +152,7 @@ export = (RED: Red) => {
                        config: ChartRenderProp) {
         RED.nodes.createNode(this, config);
         let node = this;
+        this.chartType = config.chartType;
 
         node.on('input', function(msg) {
             let payload = msg.payload as string;
