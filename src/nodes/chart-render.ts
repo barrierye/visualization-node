@@ -7,6 +7,7 @@ interface ChartRenderProp extends NodeProperties {
 
 interface ChartRenderNode extends Node {
     chartType: string
+    data: Array<number>
 }
 
 interface ValueSpec {
@@ -98,13 +99,14 @@ let default_marks = [
     }
 ]
 
-function genJson(input: string) {
+function genJson(node: ChartRenderNode) {
+    let values = Array<ValueSpec>();
+    for (let i = 0; i < node.data.length; ++i) {
+        values.push({"category":i.toString(), "amount": node.data[i]});
+    }
     let data: DataSpec = {
         name: 'table',
-        values: [
-            {"category": "A", "amount": 28},
-            {"category": "B", "amount": 55}
-        ]
+        values: values
     };
 
     let spec: VegaSpec = {
@@ -120,50 +122,36 @@ function genJson(input: string) {
     return spec
 }
 
-function getPNGStream(node: ChartRenderNode, spec: VegaSpec) { // TODO
-    var vega = require('vega');
-    var fs = require('fs')
-
-    // create a new view instance for a given Vega JSON spec
-    var view = new vega.View(vega.parse(spec), {renderer: 'none'});
-
-    // generate a static SVG image
-    view.toSVG()
-    .then(function(svg: any) {
-        // process svg string
-    })
-    .catch(function(err: any) { console.error(err); });
-
-    // generate a static PNG image
-    view.toCanvas()
-    .then(function(canvas: any) {
-        // process node-canvas instance
-        // for example, generate a PNG stream to write
-        var stream = canvas.createPNGStream();
-        const out = fs.createWriteStream('test.png');
-        stream.pipe(out);
-    })
-    .catch(function(err: any) { console.error(err); });
-    return null
-}
-
 export = (RED: Red) => {
     function buildNode(this: ChartRenderNode,
                        config: ChartRenderProp) {
         RED.nodes.createNode(this, config);
         let node = this;
         this.chartType = config.chartType;
+        this.data = new Array<number>();
 
+        var vega = require('vega');
+        var fs = require('fs')
         node.on('input', function(msg) {
-            let payload = msg.payload as string;
+            let payload = msg.payload as number;
             
-            var json = genJson(payload);
-            getPNGStream(node, json);
+            node.data.push(payload);
+            var spec = genJson(node);
 
-            msg.payload = 'file will be wrote in test.png';
-            node.send(msg);
+            var view = new vega.View(vega.parse(spec), {renderer: 'none'});
+            view.toCanvas()
+            .then(function(canvas: any) {
+                var imgBase64 = canvas.toDataURL('image/jpeg');
+                var stream = canvas.createPNGStream();
+                const out = fs.createWriteStream('test.png');
+                stream.pipe(out);
+                console.log('saved pic');
+                return imgBase64;
+            }).then(function(str: string) {
+                msg.payload = str;
+                node.send(msg);
+            });
         });
-
     }
     RED.nodes.registerType('chart-render', buildNode);
 }

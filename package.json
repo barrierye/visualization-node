@@ -4,7 +4,7 @@
   "description": "visualization node for Node-RED",
   "main": "index.js",
   "scripts": {
-    "build": "mkdir -p dist/nodes/ && cp -a src/nodes/*.html dist/nodes && tsc",
+    "build": "mkdir -p dist/nodes/ && cp -a src/nodes/*.html dist/nodes && cp -a dist/*.js dist/nodes && tsc",
     "start": "node index.js",
     "watch": "tsc -watch",
     "prestart": "tsc",
@@ -26,6 +26,7 @@
   },
   "dependencies": {
     "axios": "^0.19.2",
-    "vega": "^5.10.1"
+    "canvas": "^2.6.1",
+    "vega": "^5.11.1"
   }
 }
