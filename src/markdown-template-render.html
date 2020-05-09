@@ -1,0 +1,150 @@
+<script type="text/html" data-template-name="template-render">
+  <div class='form-row'>
+      <label for="node-input-name">
+          <i class="icon-tag"></i> 名称
+      </label>
+
+      <input type="text" id="node-input-name" placeholder="Name">
+  </div>
+  <!-- <div class="form-row">
+      <label for="node-input-inputSeparator">
+          <i class="icon-tag"></i> InputSeparator
+      </label>
+      <input type="text" id="node-input-inputSeparator" placeholder="InputSeparator">
+  </div>
+  <div class="form-row">
+      <label for="node-input-placeholder">
+          <i class="icon-tag"></i> Placeholder
+      </label>
+      <input type="text" id="node-input-placeholder" placeholder="Placeholder">
+  </div> -->
+  <div class="form-row">
+    <label for="node-input-leftDelimiter">
+      <i class="icon-tag"></i> 左标识符
+    </label>
+    <input type="text" id="node-input-leftDelimiter">
+    <label for="node-input-rightDelimiter">
+      <i class="icon-tag"></i> 右标识符
+    </label>
+    <input type="text" id="node-input-rightDelimiter">
+  </div>
+  <div class="form-row" style="margin-bottom: 0px;">
+    <label for="node-input-func"><i class="fa fa-wrench"></i> 模板</span></label>
+    <input type="hidden" id="node-input-template" autofocus="autofocus">
+    <input type="hidden" id="node-input-noerr">
+  </div>
+  <div class="form-row node-text-editor-row" style="position:relative">
+    <div style="height: 250px; min-height:150px;" class="node-text-editor" id="node-input-template-editor"></div>
+  </div>
+  <div class="form-row">
+    <label for="node-input-clearWhenOutput"><i class="icon-tag"></i> 输出后清空所有字段</label>
+    <select id="node-input-clearWhenOutput">
+      <option value="true" selected>True</option>
+      <option value="false">False</option>
+    </select>
+  </div>
+  <div class="form-row">
+    <label for="node-input-outputWhenAllSet"><i class="icon-tag"></i> 仅当所有字段都非空时输出</label>
+    <select id="node-input-outputWhenAllSet">
+      <option value="true" selected>True</option>
+      <option value="false">False</option>
+    </select>
+  </div>
+  <!-- <div class="form-row">
+      <label for="node-input-markdownTemplate">
+          <i class="icon-tag"></i> MarkdownTemplate
+      </label>
+      <input type="text" id="node-input-markdownTemplate" placeholder="MarkdownTemplate">
+  </div> -->
+</script>
+
+<script type="text/html" data-help-name="template-render">
+  <p>
+      Render markdown template.
+  </p>
+</script>
+
+<script type="text/javascript">
+  RED.nodes.registerType("template-render", {
+    category: "rendering",
+    color: "#a6bbcf",
+    defaults: {
+      name: { value: "" },
+      leftDelimiter: { value: "{{", required: true },
+      rightDelimiter: { value: "}}", required: true },
+      clearWhenOutput: { value: "true", required: true },
+      outputWhenAllSet: { value: "true", required: true },
+      // inputSeparator: {
+      //   value: ";",
+      //   required: true,
+      // },
+      // placeholder: {
+      //   value: "<placeholder>",
+      //   required: true,
+      // },
+      template: { value: "", required: true },
+    },
+    inputs: 1,
+    outputs: 1,
+    icon: "file.png",
+    label: function () {
+      return this.name || "template-render"
+    },
+    oneditprepare: function () {
+      var that = this
+
+      this.editor = RED.editor.createEditor({
+        id: "node-input-template-editor",
+        mode: "ace/mode/markdown",
+        value: $("#node-input-template").val(),
+        globals: {
+          msg: true,
+          context: true,
+          RED: true,
+          util: true,
+          flow: true,
+          global: true,
+          console: true,
+          Buffer: true,
+          setTimeout: true,
+          clearTimeout: true,
+          setInterval: true,
+          clearInterval: true,
+        },
+      })
+      this.editor.focus()
+    },
+    oneditsave: function () {
+      var annot = this.editor.getSession().getAnnotations()
+      this.noerr = 0
+      $("#node-input-noerr").val(0)
+      for (var k = 0; k < annot.length; k++) {
+        //console.log(annot[k].type,":",annot[k].text, "on line", annot[k].row);
+        if (annot[k].type === "error") {
+          $("#node-input-noerr").val(annot.length)
+          this.noerr = annot.length
+        }
+      }
+      $("#node-input-template").val(this.editor.getValue())
+      this.editor.destroy()
+      delete this.editor
+    },
+    oneditcancel: function () {
+      this.editor.destroy()
+      delete this.editor
+    },
+    oneditresize: function (size) {
+      var rows = $("#dialog-form>div:not(.node-text-editor-row)")
+      var height = $("#dialog-form").height()
+      for (var i = 0; i < rows.length; i++) {
+        height -= $(rows[i]).outerHeight(true)
+      }
+      var editorRow = $("#dialog-form>div.node-text-editor-row")
+      height -=
+        parseInt(editorRow.css("marginTop")) +
+        parseInt(editorRow.css("marginBottom"))
+      $(".node-text-editor").css("height", height + "px")
+      this.editor.resize()
+    },
+  })
+</script>

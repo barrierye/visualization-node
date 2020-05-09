@@ -4,7 +4,7 @@
   "description": "visualization node for Node-RED",
   "main": "index.js",
   "scripts": {
-    "build": "mkdir -p dist/nodes/ && cp -a src/nodes/*.html dist/nodes && cp -a dist/*.js dist/nodes && tsc",
+    "build": "cp -a src/*.html dist/ && cp src/*.js dist/",
     "start": "node index.js",
     "watch": "tsc -watch",
     "prestart": "tsc",
@@ -15,18 +15,13 @@
   "license": "Apache-2.0",
   "node-red": {
     "nodes": {
-      "markdown-template-render": "dist/nodes/markdown-template-render.js",
-      "chart-render": "dist/nodes/chart-render.js"
+      "template-render": "dist/markdown-template-render.js",
+      "chart-render": "dist/chart-render.js",
+      "field-join": "dist/field-join.js"
     }
   },
-  "devDependencies": {
-    "@types/node-red": "^0.20.1",
-    "node-red": "^1.0.4",
-    "typescript": "^3.8.3"
-  },
   "dependencies": {
-    "axios": "^0.19.2",
-    "canvas": "^2.6.1",
+    "os-utils": "^0.0.14",
     "vega": "^5.11.1"
   }
 }
