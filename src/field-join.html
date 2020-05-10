@@ -1,39 +1,39 @@
 <script type="text/html" data-template-name="field-join">
-    <div class='form-row'>
-        <label for="node-input-name">
-            <i class="icon-tag"></i> 名称
-        </label>
-        <input type="text" id="node-input-name" placeholder="Name">
-    </div>
-    <div class="form-row" style="margin-bottom: 0px;">
-      <label for="node-input-func"><i class="fa fa-wrench"></i> 字段（每行一条）</span></label>
-      <input type="hidden" id="node-input-fields" autofocus="autofocus">
-      <input type="hidden" id="node-input-noerr">
-    </div>
-    <div class="form-row node-text-editor-row" style="position:relative">
-      <div style="position: absolute; right:0; bottom:calc(100% + 3px);"><button id="node-function-expand-js" class="red-ui-button red-ui-button-small"><i class="fa fa-expand"></i></button></div>
-      <div style="height: 250px; min-height:150px;" class="node-text-editor" id="node-input-fields-editor" ></div>
-    </div>
-    <div class="form-row">
-      <label for="node-input-clearWhenOutput"><i class="icon-tag"></i> 输出后清空所有字段</label>
-      <select id="node-input-clearWhenOutput">
-        <option value="true">True</option>
-        <option value="false">False</option>
-      </select>
-    </div>
-    <div class="form-row">
-      <label for="node-input-outputWhenAllSet"><i class="icon-tag"></i> 仅当所有字段都非空时输出</label>
-      <select id="node-input-outputWhenAllSet">
-        <option value="true">True</option>
-        <option value="false">False</option>
-      </select>
-    </div>
-  </script>
+  <div class="form-row">
+      <label for="node-input-name">
+          <i class="icon-tag"></i> 名称
+      </label>
+      <input type="text" id="node-input-name" placeholder="Name">
+  </div>
+  <div class="form-row" style="margin-bottom: 0px;">
+    <label for="node-input-func"><i class="fa fa-wrench"></i> 字段（每行一条）</span></label>
+    <input type="hidden" id="node-input-fields" autofocus="autofocus">
+    <input type="hidden" id="node-input-noerr">
+  </div>
+  <div class="form-row node-text-editor-row" style="position:relative">
+    <div style="position: absolute; right:0; bottom:calc(100% + 3px);"><button id="node-function-expand-js" class="red-ui-button red-ui-button-small"><i class="fa fa-expand"></i></button></div>
+    <div style="height: 250px; min-height:150px;" class="node-text-editor" id="node-input-fields-editor" ></div>
+  </div>
+  <div class="form-row">
+    <label for="node-input-clearWhenOutput"><i class="icon-tag"></i> 输出后清空所有字段</label>
+    <select id="node-input-clearWhenOutput">
+      <option value="true">True</option>
+      <option value="false">False</option>
+    </select>
+  </div>
+  <div class="form-row">
+    <label for="node-input-outputWhenAllSet"><i class="icon-tag"></i> 仅当所有字段都非空时输出</label>
+    <select id="node-input-outputWhenAllSet">
+      <option value="true">True</option>
+      <option value="false">False</option>
+    </select>
+  </div>
+</script>
 
 <script type="text/html" data-help-name="field-join">
-    <p>
-        Render markdown template.
-    </p>
+  <p>
+      Render markdown template.
+  </p>
 </script>
 
 <script type="text/javascript">

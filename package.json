@@ -17,7 +17,9 @@
     "nodes": {
       "template-render": "dist/markdown-template-render.js",
       "chart-render": "dist/chart-render.js",
-      "field-join": "dist/field-join.js"
+      "field-join": "dist/field-join.js",
+      "cpu-usage": "dist/cpu-usage.js",
+      "mem-usage": "dist/mem-usage.js"
     }
   },
   "dependencies": {

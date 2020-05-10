@@ -1,0 +1,35 @@
+<script type="text/html" data-template-name="mem-usage">
+  <div class="form-row">
+    <label for="node-input-mode"><i class="icon-tag"></i> 模式</label>
+    <select id="node-input-mode">
+      <option value="percentage">Percentage</option>
+      <option value="actual">Actual</option>
+    </select>
+  </div>
+</script>
+
+<script type="text/html" data-help-name="mem-usage">
+  <p>
+    获取当前使用率。输入任何message触发。
+  </p>
+  <p>
+    Percentage模式返回百分比。
+  </p>
+  <p>
+    Actual模式返回实际使用的内存占用（单位为MB）。
+  </p>
+</script>
+
+<script type="text/javascript">
+  RED.nodes.registerType("mem-usage", {
+    category: "rendering",
+    color: "#a6bbcf",
+    defaults: {
+      mode: { value: "percentage", required: true }
+    },
+    inputs: 1,
+    outputs: 1,
+    icon: "timer.svg",
+    label: "mem-usage",
+  })
+</script>
