@@ -70,11 +70,21 @@ function genScales(type) {
             range: {scheme: "category10"}
         }
     ];
+    let default_polar_scales = [
+        {
+            name: "r",
+            type: "sqrt",
+            domain: {"data": "table", "field": "data"},
+            zero: true,
+            range: [20, 100]
+        }
+    ];
     let default_scales = {
         "Bar chart": default_bar_scales,
         "Line chart": default_line_scales,
         "Pie chart": default_pie_scales,
         "Radar chart": default_radar_scales,
+        "Polar area chart": default_polar_scales,
     };
     return default_scales[type];
 }
@@ -262,11 +272,71 @@ function genMarks(type) {
             }
         }
     ];
+    let default_polar_marks = [
+        {
+            type: "arc",
+            from: {"data": "table"},
+            encode: {
+                enter: {
+                    x: {
+                        field: {group: "width"}, 
+                        mult: 0.5
+                    },
+                    y: {
+                        field: {group: "height"}, 
+                        mult: 0.5
+                    },
+                    startAngle: {field: "startAngle"},
+                    endAngle: {field: "endAngle"},
+                    innerRadius: {value: 20},
+                    outerRadius: {
+                        scale: "r", 
+                        field: "data"
+                    },
+                    stroke: {value: "#fff"}
+                },
+                update: {
+                    fill: {value: "#ccc"}
+                },
+                hover: {
+                    fill: {value: "pink"}
+                }
+            }
+        },
+        {
+            type: "text",
+            from: {data: "table"},
+            encode: {
+                enter: {
+                    x: {
+                        field: {group: "width"}, 
+                        mult: 0.5
+                    },
+                    y: {
+                        field: {group: "height"}, 
+                        mult: 0.5
+                    },
+                    radius: {
+                        scale: "r", 
+                        field: "data", 
+                        offset: 8
+                    },
+                    theta: {
+                        signal: "(datum.startAngle + datum.endAngle)/2"},
+                        fill: {value: "#000"},
+                        align: {value: "center"},
+                        baseline: {value: "middle"},
+                        text: {field: "data"}
+                }
+            }
+        }
+    ];
     let default_marks = {
         "Bar chart": default_bar_marks,
         "Line chart": default_line_marks,
         "Pie chart": default_pie_marks,
         "Radar chart": default_radar_marks,
+        "Polar area chart": default_polar_marks,
     };
     return default_marks[type];
 }
@@ -305,6 +375,7 @@ function genSignals(type) {
         "Line chart": null,
         "Pie chart": default_pie_signals,
         "Radar chart": default_radar_signals,
+        "Polar area chart": null,
     };
     return default_signals[type];
 }
@@ -334,6 +405,7 @@ function genEncode(type) {
         "Line chart": null,
         "Pie chart": null,
         "Radar chart": default_radar_encode,
+        "Polar area chart": null,
     }
     return default_encode[type];
 }
@@ -398,6 +470,13 @@ function genData(type, node) {
                 }]
             }
         ];
+    } else if (type == "Polar area chart") {
+        default_data = {
+            name: "table",
+            values: values,
+            transform: [{type: "pie", field: "data"}]
+        }
+        default_data = [default_data];
     }
     return default_data;
 }
@@ -439,7 +518,16 @@ function genJson(node) {
             scales: genScales(type),
             encode: genEncode(type),
             marks: genMarks(type),
-        }
+        };
+    } else if (type == "Polar area chart") {
+        spec = {
+            width: 200,
+            height: 200,
+            data: genData(type, node),
+            scales: genScales(type),
+            title: genTitle(type, node.title),
+            marks: genMarks(type),
+        };
     }
     return spec;
 }
@@ -458,6 +546,8 @@ function addData(msg, node) {
             data_json = { id: index.toString(), field: data }
         } else if (type == "Radar chart") {
             data_json = { key: "key-" + index.toString(), value: data, category: 0 }
+        } else if (type == "Polar area chart") {
+            data_json = data;
         }
     } else {
         if (node.chartType == "Bar chart") {
@@ -477,6 +567,11 @@ function addData(msg, node) {
             }
         } else if (type == "Radar chart") {
             data_json = { key: msg.x, value: msg.y, category: 0 }
+            if (msg.format != null) {
+                node.format_str = { parse: { key: msg.format } };
+            }
+        } else if (type == "Polar area chart") {
+            data_json = msg.y;
             if (msg.format != null) {
                 node.format_str = { parse: { key: msg.format } };
             }
@@ -506,6 +601,7 @@ module.exports = (RED) => {
             addData(msg, node)
 
             var spec = genJson(node);
+            console.log(spec);
             var view = new vega.View(vega.parse(spec), { renderer: "none" });
             view
                 .toCanvas()
