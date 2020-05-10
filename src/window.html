@@ -1,0 +1,125 @@
+<script type="text/html" data-template-name="window">
+  <div class="form-row">
+    <label for="node-input-name">
+      <i class="icon-tag"></i> 名称
+    </label>
+    <input type="text" id="node-input-name">
+  </div>
+  <div class="form-row">
+    <label for="node-input-mode">
+      <i class="icon-tag"></i> 窗口模式
+    </label>
+    <select id="node-input-mode">
+      <option value="tumbling">Tumbling</option>
+      <option value="sliding">Sliding</option>
+      <option value="session">Session</option>
+    </select>
+  </div>
+  <div class="form-row">
+    <label for="node-input-element">
+      <i class="icon-tag"></i> 窗口元素
+    </label>
+    <select id="node-input-element">
+      <option value="time">Time</option>
+      <option value="point">Data Point</option>
+    </select>
+  </div>
+  <div class="form-row option-display" id="tumbling-time-size" style="display: none">
+    <label for="node-input-tumblingTimeSize">
+      <i class="icon-tag"></i> 窗口时长
+    </label>
+    <input type="text" id="node-input-tumblingTimeSize" style="width: 50px">
+    <select id="node-input-tumblingTimeUnit" style="width: 80px">
+      <option value="1">Second</option>
+      <option value="60">Minute</option>
+      <option value="3600">Hour</option>
+      <option value="86400">Day</option>
+      <option value="604800">Week</option>
+    </select>
+  </div>
+  <div class="form-row option-display" id="tumbling-point-size" style="display: none">
+    <label for="node-input-tumblingPointSize">
+      <i class="icon-tag"></i> 窗口长度
+    </label>
+    <input type="text" id="node-input-tumblingPointSize" style="width: 80px">
+  </div>
+  <div class="form-row option-display" id="sliding-time-slide" style="display: none">
+    <label for="node-input-slidingTimeSlide">
+      <i class="icon-tag"></i> 滑动时长
+    </label>
+    <input type="text" id="node-input-slidingTimeSlide" style="width: 50px">
+    <select id="node-input-slidingTimeSlideUnit" style="width: 80px">
+      <option value="1">Second</option>
+      <option value="60">Minute</option>
+      <option value="3600">Hour</option>
+      <option value="86400">Day</option>
+      <option value="604800">Week</option>
+    </select>
+  </div>
+  <div class="form-row option-display" id="sliding-point-slide" style="display: none">
+    <label for="node-input-slidingPointSlide">
+      <i class="icon-tag"></i> 滑动长度
+    </label>
+    <input type="text" id="node-input-slidingPointSlide" style="width: 80px">
+  </div>
+</script>
+
+<script type="text/html" data-help-name="window">
+</script>
+
+<script type="text/javascript">
+  RED.nodes.registerType("window", {
+    category: "rendering",
+    color: "#a6bbcf",
+    defaults: {
+      name: { value: "" },
+      mode: { value: "tumbling", require: true },
+      element: { value: "time", require: true },
+      tumblingTimeSize: { value: 1, validate: RED.validators.number() },
+      tumblingTimeUnit: { value: "3600" },
+      tumblingPointSize: { value: 100, validate: RED.validators.number() },
+      slidingTimeSlide: { value: 1, validate: RED.validators.number() },
+      slidingTimeSlideUnit: { value: "3600" },
+      slidingPointSlide: { value: 100, validate: RED.validators.number() }
+    },
+    inputs: 1,
+    outputs: 1,
+    icon: "file.png",
+    label: function () {
+      return this.name || "window"
+    },
+    oneditprepare: function () {
+      let node = this
+      function display(mode, element) {
+        $(".option-display").hide()
+        if (mode === "tumbling" || mode === "sliding") {
+          if (element === "time") {
+            $("#tumbling-time-size").show()
+          } else if (element === "point") {
+            $("#tumbling-point-size").show()
+          }
+          if (mode === "sliding") {
+            if (element === "time") {
+              $("#sliding-time-slide").show()
+            } else if (element === "point") {
+              $("#sliding-point-slide").show()
+            }
+          }
+        }
+      }
+      $("#node-input-mode").on("change", function () {
+        mode = $(this).val()
+        element = $("#node-input-element").val()
+        console.log(mode, element)
+        display(mode, element)
+      })
+      $("#node-input-element").on("change", function () {
+        mode = $("#node-input-mode").val()
+        element = $(this).val()
+        console.log(mode, element)
+        display(mode, element)
+      })
+      display(node.mode, node.element)
+    }
+  })
+</script>
