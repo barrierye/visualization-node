@@ -1,0 +1,35 @@
+<script type="text/html" data-template-name="cpu-usage">
+  <div class="form-row">
+    <label for="node-input-mode"><i class="icon-tag"></i> 模式</label>
+    <select id="node-input-mode">
+      <option value="percentage">Percentage</option>
+      <option value="cores">Cores</option>
+    </select>
+  </div>
+</script>
+
+<script type="text/html" data-help-name="cpu-usage">
+  <p>
+    获取一秒内的CPU使用率。输入任何message触发。
+  </p>
+  <p>
+    Percentage模式返回百分比。
+  </p>
+  <p>
+    Cores模式返回CPU使用的核数（百分比*核数）。
+  </p>
+</script>
+
+<script type="text/javascript">
+  RED.nodes.registerType("cpu-usage", {
+    category: "rendering",
+    color: "#a6bbcf",
+    defaults: {
+      mode: { value: "percentage", required: true }
+    },
+    inputs: 1,
+    outputs: 1,
+    icon: "timer.svg",
+    label: "cpu-usage",
+  })
+</script>
