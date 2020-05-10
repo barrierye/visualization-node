@@ -22,11 +22,13 @@
     <label for="node-input-leftDelimiter">
       <i class="icon-tag"></i> 左标识符
     </label>
-    <input type="text" id="node-input-leftDelimiter">
+    <input type="text" id="node-input-leftDelimiter" style="width: 60px">
+  </div>
+  <div class="form-row">
     <label for="node-input-rightDelimiter">
       <i class="icon-tag"></i> 右标识符
     </label>
-    <input type="text" id="node-input-rightDelimiter">
+    <input type="text" id="node-input-rightDelimiter" stype="width: 60px">
   </div>
   <div class="form-row" style="margin-bottom: 0px;">
     <label for="node-input-func"><i class="fa fa-wrench"></i> 模板</span></label>
@@ -74,15 +76,7 @@
       rightDelimiter: { value: "}}", required: true },
       clearWhenOutput: { value: "true", required: true },
       outputWhenAllSet: { value: "true", required: true },
-      // inputSeparator: {
-      //   value: ";",
-      //   required: true,
-      // },
-      // placeholder: {
-      //   value: "<placeholder>",
-      //   required: true,
-      // },
-      template: { value: "", required: true },
+      template: { value: "" },
     },
     inputs: 1,
     outputs: 1,
