@@ -30,7 +30,52 @@
         icon: 'file.png',
         label: function() {
             return this.name || "chart-render";
-        }
+        },
+        oneditprepare: function() {
+            if (!$("#node-input-chartType").val()) {
+                $("#node-input-chartType").val("Line chart");
+            }
+            if ($("#node-input-enable-data-window")[0].checked) {
+                $("#data-window-show").show();
+            } else {
+                $("#data-window-show").hide();
+            }
+            $("#node-input-chartType").on("change", function() {
+                if ($(this).val() === "Line chart") {
+                    $("#title-show").show();
+                    $("#y-label-show").show();
+                    $("#x-label-show").show();
+                    // $("#data-window-show").hide();
+                } else if ($(this).val() === "Bar chart") {
+                    $("#title-show").show();
+                    $("#y-label-show").show();
+                    $("#x-label-show").show();
+                    // $("#data-window-show").hide();
+                } else if ($(this).val() === "Pie chart") {
+                    $("#title-show").show();
+                    $("#y-label-show").hide();
+                    $("#x-label-show").hide();
+                    // $("#data-window-show").hide();
+                } else if ($(this).val() === "Radar chart") {
+                    $("#title-show").show();
+                    $("#y-label-show").hide();
+                    $("#x-label-show").hide();
+                    // $("#data-window-show").hide();
+                } else if ($(this).val() === "Polar area chart") {
+                    $("#title-show").show();
+                    $("#y-label-show").hide();
+                    $("#x-label-show").hide();
+                    // $("#data-window-show").hide();
+                }
+            });
+            $("#node-input-enable-data-window").on("change", function() {
+                if ($(this)[0].checked) {
+                    $("#data-window-show").show();
+                } else {
+                    $("#data-window-show").hide();
+                }
+            });
+        },
     })
 </script>
 
@@ -44,7 +89,7 @@
 
     <div class="form-row">
         <label for="node-input-chartType">
-            <i class="icon-tag"></i> chartType
+            <i class="icon-tag"></i> ChartType
         </label>
         <select type="text" id="node-input-chartType">
             <option value="Line chart">Line chart </option>
@@ -53,32 +98,35 @@
             <option value="Radar chart">Radar chart </option>
             <option value="Polar area chart">Polar area chart </option>
         </select>
+        <div class="show-dot-field" style="display:inline-block;">
+            <input type="checkbox" id="node-input-enable-data-window" style="display:inline-block; width:auto; vertical-align:baseline;"> Data Window
+        </div>
     </div>
     
-    <div class="form-row">
+    <div class="form-row" id="title-show">
         <label for="node-input-title">
-            <i class="icon-tag"></i> title
+            <i class="icon-tag"></i> Title
         </label>
         <input type="text" id="node-input-title" placeholder="Title">
     </div>
     
-    <div class="form-row">
+    <div class="form-row" id="x-label-show">
         <label for="node-input-xLabel">
-            <i class="icon-tag"></i> xLabel
+            <i class="icon-tag"></i> X-Label
         </label>
         <input type="text" id="node-input-xLabel" placeholder="XLabel">
     </div>
     
-    <div class="form-row">
+    <div class="form-row" id="y-label-show">
         <label for="node-input-yLabel">
-            <i class="icon-tag"></i> yLabel
+            <i class="icon-tag"></i> Y-Label
         </label>
         <input type="text" id="node-input-yLabel" placeholder="YLabel">
     </div>
 
-    <div class="form-row">
+    <div class="form-row" id="data-window-show">
         <label for="node-input-dataWindow">
-            <i class="icon-tag"></i> dataWindow
+            <i class="icon-tag"></i> WindowSize
         </label>
         <input type="text" id="node-input-dataWindow" placeholder="DataWindow">
     </div>
