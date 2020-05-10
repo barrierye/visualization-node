@@ -46,11 +46,35 @@ function genScales(type) {
             range: { scheme: "category20" },
         },
     ];
-
+    let default_radar_scales = [
+        {
+            name: "angular",
+            type: "point",
+            range: {signal: "[-PI, PI]"},
+            padding: 0.5,
+            domain: {data: "table", field: "key"}
+        },
+        {
+            name: "radial",
+            type: "linear",
+            range: {signal: "[0, radius]"},
+            zero: true,
+            nice: false,
+            domain: {data: "table", field: "value"},
+            domainMin: 0
+        },
+        {
+            name: "color",
+            type: "ordinal",
+            domain: {data: "table", field: "category"},
+            range: {scheme: "category10"}
+        }
+    ];
     let default_scales = {
         "Bar chart": default_bar_scales,
         "Line chart": default_line_scales,
         "Pie chart": default_pie_scales,
+        "Radar chart": default_radar_scales,
     };
     return default_scales[type];
 }
@@ -126,10 +150,123 @@ function genMarks(type) {
             },
         },
     ];
+    let default_radar_marks = [
+        {
+            type: "group",
+            name: "categories",
+            zindex: 1,
+            from: {
+                facet: {
+                    data: "table", 
+                    name: "facet", 
+                    groupby: ["category"]
+                }
+            },
+            marks: [{
+                type: "line",
+                name: "category-line",
+                from: {data: "facet"},
+                encode: {
+                    enter: {
+                        interpolate: {value: "linear-closed"},
+                        x: {signal: "scale('radial', datum.value) * cos(scale('angular', datum.key))"},
+                        y: {signal: "scale('radial', datum.value) * sin(scale('angular', datum.key))"},
+                        stroke: {
+                            scale: "color", 
+                            field: "category"
+                        },
+                        strokeWidth: {value: 1},
+                        fill: {
+                            scale: "color", 
+                            field: "category"
+                        },
+                        fillOpacity: {value: 0.1}
+                    }
+                }
+            },
+            {
+                type: "text",
+                name: "value-text",
+                from: {data: "category-line"},
+                encode: {
+                    enter: {
+                        x: {signal: "datum.x"},
+                        y: {signal: "datum.y"},
+                        text: {signal: "datum.datum.value"},
+                        align: {value: "center"},
+                        baseline: {value: "middle"},
+                        fill: {value: "black"}
+                    }
+                }
+            }]
+        },
+        {
+            type: "rule",
+            name: "radial-grid",
+            from: {data: "keys"},
+            zindex: 0,
+            encode: {
+                enter: {
+                    x: {value: 0},
+                    y: {value: 0},
+                    x2: {signal: "radius * cos(scale('angular', datum.key))"},
+                    y2: {signal: "radius * sin(scale('angular', datum.key))"},
+                    stroke: {value: "lightgray"},
+                    strokeWidth: {value: 1}
+                }
+            }
+        },
+        {
+            type: "text",
+            name: "key-label",
+            from: {data: "keys"},
+            zindex: 1,
+            encode: {
+                enter: {
+                    x: {signal: "(radius + 5) * cos(scale('angular', datum.key))"},
+                    y: {signal: "(radius + 5) * sin(scale('angular', datum.key))"},
+                    text: {field: "key"},
+                    align: [{
+                        test: "abs(scale('angular', datum.key)) > PI / 2",
+                        value: "right"
+                    },
+                    {
+                        value: "left"
+                    }],
+                    baseline: [{
+                        test: "scale('angular', datum.key) > 0", "value": "top"
+                    },
+                    {
+                        test: "scale('angular', datum.key) == 0", "value": "middle"
+                    },
+                    {
+                        value: "bottom"
+                    }],
+                    fill: {value: "black"},
+                    fontWeight: {value: "bold"}
+                }
+            }
+        },
+        {
+            type: "line",
+            name: "outer-line",
+            from: {data: "radial-grid"},
+            encode: {
+                enter: {
+                    interpolate: {value: "linear-closed"},
+                    x: {field: "x2"},
+                    y: {field: "y2"},
+                    stroke: {value: "lightgray"},
+                    strokeWidth: {value: 1}
+                }
+            }
+        }
+    ];
     let default_marks = {
         "Bar chart": default_bar_marks,
         "Line chart": default_line_marks,
         "Pie chart": default_pie_marks,
+        "Radar chart": default_radar_marks,
     };
     return default_marks[type];
 }
@@ -160,17 +297,21 @@ function genSignals(type) {
           "bind": {"input": "checkbox"}
         }
     ];
+    let default_radar_signals = [
+        {"name": "radius", "update": "width / 2"}
+    ];
     let default_signals = {
         "Bar chart": null,
         "Line chart": null,
         "Pie chart": default_pie_signals,
+        "Radar chart": default_radar_signals,
     };
     return default_signals[type];
 }
 function genAxes(type, xLabel, yLabel) {
     let default_axes = [
-        { orient: "bottom", scale: "x", title: xLabel },
-        { orient: "left", scale: "y", title: yLabel },
+        { orient: "bottom", scale: "x", title: xLabel, labelOverlap: true },
+        { orient: "left", scale: "y", title: yLabel, labelOverlap: true },
     ];
     return default_axes;
 }
@@ -181,31 +322,47 @@ function genTitle(type, title) {
     default_title.text = title;
     return default_title;
 }
-function genData(type, data) {
+function genEncode(type) {
+    let default_radar_encode = {
+        "enter": {
+            "x": {"signal": "radius"},
+            "y": {"signal": "radius"}
+        }
+    }
+    let default_encode = {
+        "Bar chart": null,
+        "Line chart": null,
+        "Pie chart": null,
+        "Radar chart": default_radar_encode,
+    }
+    return default_encode[type];
+}
+function genData(type, node) {
     let values = Array();
+    var default_data;
+    for (let i = 0; i < node.data.length; ++i) {
+        values.push(node.data[i]);
+    }
     if (type == "Bar chart") {
-        for (let i = 0; i < data.length; ++i) {
-            values.push({ category: i.toString(), amount: data[i] });
-        }
-        let default_data = {
+        default_data = {
             name: "table",
             values: values,
         };
-        return [default_data];
+        if (node.format_str != null) {
+            default_data.format = node.format_str;
+        }
+        default_data = [default_data];
     } else if (type == "Line chart") {
-        for (let i = 0; i < data.length; ++i) {
-            values.push({ x: i.toString(), y: data[i], c: 0 });
-        }
-        let default_data = {
+        default_data = {
             name: "table",
             values: values,
         };
-        return [default_data];
-    } else if (type == "Pie chart") {
-        for (let i = 0; i < data.length; ++i) {
-            values.push({ id: i.toString(), field: data[i] });
+        if (node.format_str != null) {
+            default_data.format = node.format_str;
         }
-        let default_data = {
+        default_data = [default_data];
+    } else if (type == "Pie chart") {
+        default_data = {
             name: "table",
             values: values,
             transform: [
@@ -218,43 +375,115 @@ function genData(type, data) {
                 },
             ],
         };
-        return [default_data];
+        if (node.format_str != null) {
+            default_data.format = node.format_str;
+        }
+        default_data = [default_data];
+    } else if (type == "Radar chart") {
+        default_data = {
+            name: "table",
+            values: values,
+        }
+        if (node.format_str != null) {
+            default_data.format = node.format_str;
+        }
+        default_data = [
+            default_data,
+            {
+                name: "keys",
+                source: "table",
+                transform: [{
+                    type: "aggregate",
+                    groupby: ["key"]
+                }]
+            }
+        ];
     }
+    return default_data;
 }
 function genJson(node) {
     let type = node.chartType;
+    var spec;
     if (type == "Bar chart" || type == "Line chart") {
-        let spec = {
+        spec = {
             width: 400,
             height: 200,
             padding: 5,
             signals: genSignals(type),
-            data: genData(type, node.data),
+            data: genData(type, node),
             title: genTitle(type, node.title),
             scales: genScales(type),
             axes: genAxes(type, node.xLabel, node.yLabel),
             marks: genMarks(type),
         };
-        return spec;
-    }
-    else if (type == "Pie chart") {
-        let spec = {
+    } else if (type == "Pie chart") {
+        spec = {
             width: 200,
             height: 200,
             autosize: "none",
             signals: genSignals(type),
-            data: genData(type, node.data),
+            data: genData(type, node),
             title: genTitle(type, node.title),
             scales: genScales(type),
             marks: genMarks(type),
         };
-        return spec;
+    } else if (type == "Radar chart") {
+        spec = {
+            width: 400,
+            height: 400,
+            padding: 40,
+            title: genTitle(type, node.title),
+            autosize: {type: "none", contains: "padding"},
+            signals: genSignals(type),
+            data: genData(type, node),
+            scales: genScales(type),
+            encode: genEncode(type),
+            marks: genMarks(type),
+        }
     }
+    return spec;
 }
 function addData(msg, node) {
-    let data = msg.payload;
+    var data_json;
+    let type = node.chartType;
+    node.format_str = null;
+    if (msg.payload != "null") {
+        let data = msg.payload;
+        let index = 1 + node.data.length;
+        if (node.chartType == "Bar chart") {
+            data_json = { category: index.toString(), amount: data };
+        } else if (type == "Line chart") {
+            data_json = { x: index.toString(), y: data, c: 0 };
+        } else if (type == "Pie chart") {
+            data_json = { id: index.toString(), field: data }
+        } else if (type == "Radar chart") {
+            data_json = { key: "key-" + index.toString(), value: data, category: 0 }
+        }
+    } else {
+        if (node.chartType == "Bar chart") {
+            data_json = { category: msg.x, amount: msg.y };
+            if (msg.format != null) {
+                node.format_str = { parse: { category: msg.format } };
+            }
+        } else if (type == "Line chart") {
+            data_json = { x: msg.x, y: msg.y, c: 0 };
+            if (msg.format != null) {
+                node.format_str = { parse: { x: msg.format } };
+            }
+        } else if (type == "Pie chart") {
+            data_json = { id: msg.x, field: msg.y }
+            if (msg.format != null) {
+                node.format_str = { parse: { id: msg.format } };
+            }
+        } else if (type == "Radar chart") {
+            data_json = { key: msg.x, value: msg.y, category: 0 }
+            if (msg.format != null) {
+                node.format_str = { parse: { key: msg.format } };
+            }
+        }
+    }
     // check data
-    node.data.push(data);
+    node.data.push(data_json);
 
     if (node.dataWindow > 0 && node.data.length > node.dataWindow) {
         node.data.shift()
@@ -277,21 +506,17 @@ module.exports = (RED) => {
             addData(msg, node)
 
             var spec = genJson(node);
-            // console.log(spec);
             var view = new vega.View(vega.parse(spec), { renderer: "none" });
             view
                 .toCanvas()
                 .then(function (canvas) {
                 var imgBase64 = canvas.toDataURL("image/png");
                 var imgData = imgBase64.replace(/^data:image\/\w+;base64,/, "");
-                // var stream = canvas.createPNGStream();
-                // const out = fs.createWriteStream("test.png");
-                // stream.pipe(out);
-                // console.log(imgBase64);
                 return imgData;
             })
-                .then(function (str) {
-                msg.payload = str;
+                .then(function (base64_str) {
+                msg.payload = base64_str;
+                msg.binbuf = Buffer.from(base64_str, 'base64')
                 node.send(msg);
             });
         });
