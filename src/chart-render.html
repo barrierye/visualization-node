@@ -19,6 +19,10 @@
             yLabel: {
                 value: "y-axis",
                 required: false
+            },
+            dataWindow: {
+                value: 0,
+                required: true
             }
         },
         inputs: 1,
@@ -70,11 +74,37 @@
         <input type="text" id="node-input-yLabel" placeholder="YLabel">
     </div>
 
+    <div class="form-row">
+        <label for="node-input-dataWindow">
+            <i class="icon-tag"></i> dataWindow
+        </label>
+        <input type="text" id="node-input-dataWindow" placeholder="DataWindow">
+    </div>
 </script>
 
 <script type="text/html" data-help-name='chart-render'>
     <p>
-        定义对接收到的数据进行处理的图表类型，标题，横纵坐标轴。
-        输入数据在名为msg的JavaScript对象中传递。
+        用于对接收到的数据进行图表绘制。
+        需要定义图表类型，标题，横纵坐标轴，数据窗口大小。
+        将输出png图像的Base64字符串(message.payload)。
     </p>
+    <h3>inputs</h3>
+        <dl class="message-properties">
+            <dt>payload
+                <span class="property-type">number </span>
+            </dt>
+            <dd> 输入的数据。 </dd>
+        </dl>
+    <h3>Outputs</h3>
+        <ol class="node-ports">
+         <li>Standard output
+             <dl class="message-properties">
+                 <dt>payload <span class="property-type">string</span></dt>
+                 <dd>渲染得到的PNG格式的图片，以base64形式输出。</dd>
+             </dl>
+         </li>
+        </ol>
+    <h3>Details</h3>
+        <p><code>dataWindow</code> 是数据窗口的相关配置，若该值小于等于0，
+        则不对数据进行过滤；仅当该值大于0时，节点值保留最新的数据在窗口内。</p>
 </script>

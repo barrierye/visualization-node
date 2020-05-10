@@ -251,6 +251,15 @@ function genJson(node) {
         return spec;
     }
 }
+function addData(msg, node) {
+    let data = msg.payload;
+    // check data
+    node.data.push(data);
+
+    if (node.dataWindow > 0 && node.data.length > node.dataWindow) {
+        node.data.shift()
+    }
+}
 module.exports = (RED) => {
     function buildNode(config) {
         RED.nodes.createNode(this, config);
@@ -259,20 +268,21 @@ module.exports = (RED) => {
         this.title = config.title;
         this.xLabel = config.xLabel;
         this.yLabel = config.yLabel;
+        this.dataWindow = config.dataWindow;
 
         this.data = new Array();
         var vega = require("vega");
         var fs = require("fs");
         node.on("input", function (msg) {
-            let payload = msg.payload;
-            node.data.push(payload);
+            addData(msg, node)
+
             var spec = genJson(node);
             // console.log(spec);
             var view = new vega.View(vega.parse(spec), { renderer: "none" });
             view
                 .toCanvas()
                 .then(function (canvas) {
-                var imgBase64 = canvas.toDataURL("image/jpeg");
+                var imgBase64 = canvas.toDataURL("image/png");
                 var imgData = imgBase64.replace(/^data:image\/\w+;base64,/, "");
                 // var stream = canvas.createPNGStream();
                 // const out = fs.createWriteStream("test.png");
