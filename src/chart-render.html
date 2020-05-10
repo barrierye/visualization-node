@@ -7,6 +7,18 @@
             chartType: {
                 value: "Line chart",
                 required: true
+            },
+            title: {
+                value: "default title",
+                required: false
+            },
+            xLabel: {
+                value: "x-axis",
+                required: false
+            },
+            yLabel: {
+                value: "y-axis",
+                required: false
             }
         },
         inputs: 1,
@@ -23,9 +35,9 @@
         <label for="node-input-name">
             <i class="icon-tag"></i> Name
         </label>
-
         <input type="text" id="node-input-name" placeholder="Name">
     </div>
+
     <div class="form-row">
         <label for="node-input-chartType">
             <i class="icon-tag"></i> chartType
@@ -36,11 +48,33 @@
             <option value="Pie chart">Pie chart </option>
         </select>
     </div>
+    
+    <div class="form-row">
+        <label for="node-input-title">
+            <i class="icon-tag"></i> title
+        </label>
+        <input type="text" id="node-input-title" placeholder="Title">
+    </div>
+    
+    <div class="form-row">
+        <label for="node-input-xLabel">
+            <i class="icon-tag"></i> xLabel
+        </label>
+        <input type="text" id="node-input-xLabel" placeholder="XLabel">
+    </div>
+    
+    <div class="form-row">
+        <label for="node-input-yLabel">
+            <i class="icon-tag"></i> yLabel
+        </label>
+        <input type="text" id="node-input-yLabel" placeholder="YLabel">
+    </div>
 
 </script>
 
 <script type="text/html" data-help-name='chart-render'>
     <p>
-        Render chart.
+        定义对接收到的数据进行处理的图表类型，标题，横纵坐标轴。
+        输入数据在名为msg的JavaScript对象中传递。
     </p>
 </script>
