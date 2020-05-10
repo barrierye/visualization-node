@@ -246,7 +246,7 @@ module.exports = (RED) => {
                 .then(function (canvas) {
                 var imgBase64 = canvas.toDataURL("image/jpeg");
                 var imgData = imgBase64.replace(/^data:image\/\w+;base64,/, "");
-                var stream = canvas.createPNGStream();
+                // var stream = canvas.createPNGStream();
                 // const out = fs.createWriteStream("test.png");
                 // stream.pipe(out);
                 // console.log(imgBase64);
