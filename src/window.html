@@ -65,6 +65,10 @@
 </script>
 
 <script type="text/html" data-help-name="window">
+  <p>类似流处理中的窗口机制，根据时间或者数量进行收集输入数据并输出数组。</p>
+  <p>输入中的<code>msg.payload</code>被作为<code>data</code>，
+  输出的格式为<code>{payload: [{timestamp: 0, data: data}, {timestamp: 1, data: data}]}</code>，
+  timestamp为Unix时间戳</p>
 </script>
 
 <script type="text/javascript">
