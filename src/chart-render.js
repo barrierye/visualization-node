@@ -488,6 +488,7 @@ function genJson(node) {
             width: 400,
             height: 200,
             padding: 5,
+            // autosize: {type: "none", contains: "padding"},
             signals: genSignals(type),
             data: genData(type, node),
             title: genTitle(type, node.title),
@@ -499,7 +500,7 @@ function genJson(node) {
         spec = {
             width: 200,
             height: 200,
-            autosize: "none",
+            // autosize: {type: "none", contains: "padding"},
             signals: genSignals(type),
             data: genData(type, node),
             title: genTitle(type, node.title),
@@ -523,11 +524,16 @@ function genJson(node) {
         spec = {
             width: 200,
             height: 200,
+            autosize: {type: "none", contains: "padding"},
             data: genData(type, node),
             scales: genScales(type),
             title: genTitle(type, node.title),
             marks: genMarks(type),
         };
+    }
+    if (node.width > 0 && node.height > 0) {
+        spec.width = node.width;
+        spec.height = node.height;
     }
     return spec;
 }
@@ -545,9 +551,9 @@ function addData(msg, node) {
         } else {
             throw {message: "data must be number or Array, not " + data.constructor};
         }
-        let index = 1 + node.data.length;
         for (let i = 0; i < data_arr.length; ++i) {
             var data_json;
+            let index = 1 + node.data.length;
             if (node.chartType == "Bar chart") {
                 data_json = { category: index.toString(), amount: data_arr[i] };
             } else if (type == "Line chart") {
@@ -620,6 +626,8 @@ module.exports = (RED) => {
         this.yLabel = config.yLabel;
         this.dataWindow = config.dataWindow;
         this.output = config.output;
+        this.height = config.height;
+        this.width = config.width;
 
         this.data = new Array();
         var vega = require("vega");
