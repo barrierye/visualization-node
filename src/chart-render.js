@@ -532,53 +532,79 @@ function genJson(node) {
     return spec;
 }
 function addData(msg, node) {
-    var data_json;
     let type = node.chartType;
     node.format_str = null;
     if (msg.payload != "null") {
-        let data = msg.payload;
+        var data = msg.payload;
+        var data_arr = Array();
+
+        if (typeof(data) == "number") {
+            data_arr.push(data);
+        } else if (data.constructor == Array) {
+            data_arr = data;
+        } else {
+            throw {message: "data must be number or Array, not " + data.constructor};
+        }
         let index = 1 + node.data.length;
-        if (node.chartType == "Bar chart") {
-            data_json = { category: index.toString(), amount: data };
-        } else if (type == "Line chart") {
-            data_json = { x: index.toString(), y: data, c: 0 };
-        } else if (type == "Pie chart") {
-            data_json = { id: index.toString(), field: data }
-        } else if (type == "Radar chart") {
-            data_json = { key: "key-" + index.toString(), value: data, category: 0 }
-        } else if (type == "Polar area chart") {
-            data_json = data;
+        for (let i = 0; i < data_arr.length; ++i) {
+            var data_json;
+            if (node.chartType == "Bar chart") {
+                data_json = { category: index.toString(), amount: data_arr[i] };
+            } else if (type == "Line chart") {
+                data_json = { x: index.toString(), y: data_arr[i], c: 0 };
+            } else if (type == "Pie chart") {
+                data_json = { id: index.toString(), field: data_arr[i] }
+            } else if (type == "Radar chart") {
+                data_json = { key: "key-" + index.toString(), value: data_arr[i], category: 0 }
+            } else if (type == "Polar area chart") {
+                data_json = data_arr[i];
+            }
+            node.data.push(data_json);
         }
     } else {
-        if (node.chartType == "Bar chart") {
-            data_json = { category: msg.x, amount: msg.y };
-            if (msg.format != null) {
-                node.format_str = { parse: { category: msg.format } };
+        var data_arr = {x: Array(), y: Array(), format: Array() };
+        if (typeof(msg.x) == "number") {
+            data_arr.x.push(msg.x);
+            data_arr.y.push(msg.y);
+            data_arr.format.push(msg.format);
+        } else if (msg.x.constructor == Array) {
+            data_arr.x = msg.x;
+            data_arr.y = msg.y;
+            data_arr.format = msg.format;
+        } else {
+            throw {message: "data must be number or Array, not " + msg.x.constructor};
+        }
+
+        for (let i = 0; i < data_arr.length; ++i) {
+            if (node.chartType == "Bar chart") {
+                data_json = { category: msg.x[i], amount: msg.y[i] };
+                if (msg.format != null) {
+                    node.format_str = { parse: { category: msg.format[i] } };
+                }
+            } else if (type == "Line chart") {
+                data_json = { x: msg.x[i], y: msg.y[i], c: 0 };
+                if (msg.format[i] != null) {
+                    node.format_str = { parse: { x: msg.format[i] } };
+                }
+            } else if (type == "Pie chart") {
+                data_json = { id: msg.x[i], field: msg.y[i] }
+                if (msg.format[i] != null) {
+                    node.format_str = { parse: { id: msg.format[i] } };
+                }
+            } else if (type == "Radar chart") {
+                data_json = { key: msg.x[i], value: msg.y[i], category: 0 }
+                if (msg.format[i] != null) {
+                    node.format_str = { parse: { key: msg.format[i] } };
+                }
+            } else if (type == "Polar area chart") {
+                data_json = msg.y[i];
+                if (msg.format[i] != null) {
+                    node.format_str = { parse: { key: msg.format[i] } };
+                }
             }
-        } else if (type == "Line chart") {
-            data_json = { x: msg.x, y: msg.y, c: 0 };
-            if (msg.format != null) {
-                node.format_str = { parse: { x: msg.format } };
-            }
-        } else if (type == "Pie chart") {
-            data_json = { id: msg.x, field: msg.y }
-            if (msg.format != null) {
-                node.format_str = { parse: { id: msg.format } };
-            }
-        } else if (type == "Radar chart") {
-            data_json = { key: msg.x, value: msg.y, category: 0 }
-            if (msg.format != null) {
-                node.format_str = { parse: { key: msg.format } };
-            }
-        } else if (type == "Polar area chart") {
-            data_json = msg.y;
-            if (msg.format != null) {
-                node.format_str = { parse: { key: msg.format } };
-            }
+            node.data.push(data_json);
         }
     }
-    // check data
-    node.data.push(data_json);
 
     if (node.dataWindow > 0 && node.data.length > node.dataWindow) {
         node.data.shift()
@@ -593,28 +619,36 @@ module.exports = (RED) => {
         this.xLabel = config.xLabel;
         this.yLabel = config.yLabel;
         this.dataWindow = config.dataWindow;
+        this.output = config.output;
 
         this.data = new Array();
         var vega = require("vega");
         var fs = require("fs");
         node.on("input", function (msg) {
-            addData(msg, node)
+            try {
+                addData(msg, node)
 
-            var spec = genJson(node);
-            console.log(spec);
-            var view = new vega.View(vega.parse(spec), { renderer: "none" });
-            view
-                .toCanvas()
-                .then(function (canvas) {
-                var imgBase64 = canvas.toDataURL("image/png");
-                var imgData = imgBase64.replace(/^data:image\/\w+;base64,/, "");
-                return imgData;
-            })
-                .then(function (base64_str) {
-                msg.payload = base64_str;
-                msg.binbuf = Buffer.from(base64_str, 'base64')
-                node.send(msg);
-            });
+                var spec = genJson(node);
+                // console.log(spec);
+                var view = new vega.View(vega.parse(spec), { renderer: "none" });
+                view
+                    .toCanvas()
+                    .then(function (canvas) {
+                    var imgBase64 = canvas.toDataURL("image/png");
+                    var imgData = imgBase64.replace(/^data:image\/\w+;base64,/, "");
+                    return imgData;
+                })
+                    .then(function (base64_str) {
+                    if (node.output == "base64") {
+                        msg.payload = base64_str;
+                    } else {
+                        msg.payload = Buffer.from(base64_str, 'base64');
+                    }
+                    node.send(msg);
+                });
+            } catch (err) {
+                node.error(err.message, msg);
+            }
         });
     }
     RED.nodes.registerType("chart-render", buildNode);

@@ -23,6 +23,10 @@
             dataWindow: {
                 value: 0,
                 required: true
+            },
+            output: {
+                value: "base64",
+                required: true
             }
         },
         inputs: 1,
@@ -39,6 +43,9 @@
                 $("#data-window-show").show();
             } else {
                 $("#data-window-show").hide();
+            }
+            if (!$("#node-input-output").val()) {
+                $("#node-input-output").val("base64");
             }
             $("#node-input-chartType").on("change", function() {
                 if ($(this).val() === "Line chart") {
@@ -129,6 +136,16 @@
             <i class="icon-tag"></i> WindowSize
         </label>
         <input type="text" id="node-input-dataWindow" placeholder="DataWindow">
+    </div>
+
+    <div class="form-row">
+        <label for="node-input-output">
+            <i class="icon-tag"></i> Output
+        </label>
+        <select type="text" id="node-input-output">
+            <option value="base64">base64 </option>
+            <option value="binary">binary </option>
+        </select>
     </div>
 </script>
 
