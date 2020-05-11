@@ -25,6 +25,7 @@
   },
   "dependencies": {
     "os-utils": "^0.0.14",
-    "vega": "^5.11.1"
+    "vega": "^5.11.1",
+    "canvas": "^2.6.1"
   }
 }
