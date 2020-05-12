@@ -203,38 +203,41 @@
     <h3>inputs</h3>
         <dl class="message-properties">
             <dt>payload
-                <span class="property-type">number </span>
+                <span class="property-type">number|Array<number> </span>
             </dt>
             <dd> 输入的数据。如果该值为"null"，则从<code>msg.x</code>和<code>msg.y</code>中读取。</dd>
         </dl>
         <dl class="message-properties">
             <dt>x
-                <span class="property-type">number|date string </span>
+                <span class="property-type">string|Array<string> </span>
             </dt>
-            <dd> 当<code>msg.payload</code>为"null"时，该值为横坐标。</dd>
+            <dd> (Optional)当<code>msg.payload</code>为"null"时，该值为横坐标。</dd>
         </dl>
         <dl class="message-properties">
             <dt>y
-                <span class="property-type">number </span>
+                <span class="property-type">number|Array<number></span>
             </dt>
-            <dd> 当<code>msg.payload</code>为"null"时，该值为纵坐标。</dd>
+            <dd> (Optional)当<code>msg.payload</code>为"null"时，该值为纵坐标。</dd>
         </dl>
         <dl class="message-properties">
             <dt>format
-                <span class="property-type">string </span>
+                <span class="property-type">string|Array<string> </span>
             </dt>
             <dd> (Optional)当<code>msg.x</code>为date string时，该值为其格式化字符串。详见<a herf="https://github.com/d3/d3-time-format#locale_format">d3-time-format syntax</a></dd>
+        </dl>
+        <dl class="message-properties">
+            <dt>config
+                <span class="property-type">Object</span>
+            </dt>
+            <dd> (Optional)UI上的所有设置都可以用config变量覆盖。例如当config.chartType不为空时，节点使用config.chartType作为表格类型。
+            </dd>
         </dl>
     <h3>Outputs</h3>
         <ol class="node-ports">
          <li>Standard output
              <dl class="message-properties">
-                 <dt>payload <span class="property-type">string</span></dt>
-                 <dd>渲染得到的PNG格式的图片，以base64形式输出。</dd>
-             </dl>
-             <dl class="message-properties">
-                 <dt>binbuf <span class="property-type">Buffer</span></dt>
-                 <dd>渲染得到的PNG格式的图片，二进制存储在Buffer中。</dd>
+                 <dt>payload <span class="property-type">string|Buffer</span></dt>
+                 <dd>渲染得到的PNG格式的图片，以base64形式或binary输出（通过节点设置）。</dd>
              </dl>
          </li>
         </ol>
