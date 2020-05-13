@@ -66,7 +66,7 @@
     <label for="node-input-sessionTimeSize">
       <i class="icon-tag"></i> 会话间隔
     </label>
-    <input type="text" id="node-input-sessionTimeUnit" style="width: 50px">
+    <input type="text" id="node-input-sessionTimeSize" style="width: 50px">
     <select id="node-input-sessionTimeUnit" style="width: 80px">
       <option value="1">Second</option>
       <option value="60">Minute</option>
@@ -130,25 +130,26 @@
       }
       function disable(mode) {
         if (mode === "session")
-          $("data-point-option").attr("disabled", "disabled")
+          $("#data-point-option").attr("disabled", "disabled")
         else
-          $("data-point-option").removeAttr("disabled")
+          $("#data-point-option").removeAttr("disabled")
       }
       $("#node-input-mode").on("change", function () {
         mode = $(this).val()
         element = $("#node-input-element").val()
-        // console.log(mode, element)
+        if (mode === "session") {
+          $("#node-input-element").val("time")
+        }
         display(mode, element)
         disable(mode)
       })
       $("#node-input-element").on("change", function () {
         mode = $("#node-input-mode").val()
         element = $(this).val()
-        // console.log(mode, element)
         display(mode, element)
       })
       display(node.mode, node.element)
-      disable(mode)
+      disable(node.mode)
     }
   })
 </script>
