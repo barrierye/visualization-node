@@ -4,15 +4,19 @@ module.exports = (RED) => {
   function buildNode(config) {
     RED.nodes.createNode(this, config)
     let node = this
-    this.config = config
-    this.config.clearWhenOutput = JSON.parse(this.config.clearWhenOutput)
-    this.config.outputWhenAllSet = JSON.parse(this.config.outputWhenAllSet)
-    console.log(this.config.clearWhenOutput, this.config.outputWhenAllSet)
-    this.engine = new template_engine.TemplateEngine(
-      config.template,
-      config.leftDelimiter,
-      config.rightDelimiter
-    )
+    try {
+      this.config = config
+      this.config.clearWhenOutput = JSON.parse(this.config.clearWhenOutput)
+      this.config.outputWhenAllSet = JSON.parse(this.config.outputWhenAllSet)
+      // console.log(this.config.clearWhenOutput, this.config.outputWhenAllSet)
+      this.engine = new template_engine.TemplateEngine(
+        config.template,
+        config.leftDelimiter,
+        config.rightDelimiter
+      )
+    } catch (error) {
+      node.error(error)
+    }
     node.on("input", function (msg) {
       try {
         let data = msg.payload
@@ -21,8 +25,8 @@ module.exports = (RED) => {
           if (v != null) node.engine.setValue(k, v)
         })
         if (!node.config.outputWhenAllSet || node.engine.isAllSet()) {
-          msg["payload"] = node.engine.output()
-          node.send(msg)
+          // msg["payload"] = node.engine.output()
+          node.send({ payload: node.engine.output() })
           if (node.config.clearWhenOutput) {
             node.engine.clearValues()
           }

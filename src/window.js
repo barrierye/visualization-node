@@ -9,7 +9,7 @@ class TumblingTime {
     }
     this.callback = callback
     this.data = new Array()
-    setInterval(this.check.bind(this), this.size)
+    this.intervalId = setInterval(this.check.bind(this), this.size)
   }
   push(data) {
     this.data.push({ timestamp: Date.now(), data: data })
@@ -17,9 +17,11 @@ class TumblingTime {
   check() {
     let length = this.data.length
     if (length > 0) {
-      // console.log(this.data)
       this.callback(this.data.splice(0, length))
     }
+  }
+  stop() {
+    clearInterval(this.intervalId)
   }
 }
 class TumblingPoint {
@@ -38,6 +40,7 @@ class TumblingPoint {
       this.callback(this.data.splice(0, this.size))
     }
   }
+  stop() {}
 }
 class SlidingTime {
   constructor(windowSize, windowUnit, slideSize, slideUnit, callback) {
@@ -53,7 +56,7 @@ class SlidingTime {
     }
     this.callback = callback
     this.data = new Array()
-    setTimeout(this.check.bind(this), this.window)
+    this.timeoutID = setTimeout(this.check.bind(this), this.window)
   }
   push(data) {
     this.data.push({ timestamp: Date.now(), data: data })
@@ -67,7 +70,10 @@ class SlidingTime {
     }
     this.data.splice(0, i)
     this.callback(this.data.slice())
-    setTimeout(this.check.bind(this), this.slide)
+    this.timeoutID = setTimeout(this.check.bind(this), this.slide)
+  }
+  stop() {
+    clearTimeout(this.timeoutID)
   }
 }
 class SlidingPoint {
@@ -96,6 +102,35 @@ class SlidingPoint {
       this.callback(this.data.slice(0, this.window))
       this.deleteCount = this.slide
     }
+  }
+  stop() {}
+}
+class SessionTime {
+  constructor(windowSize, windowUnit, callback) {
+    this.window = parseInt(
+      parseFloat(windowSize) * parseFloat(windowUnit) * 1000
+    )
+    if (isNaN(this.window) || this.window <= 0) {
+      throw Error("invalid window size: " + this.window.toString())
+    }
+    this.callback = callback
+    this.data = new Array()
+    this.activated = false
+    this.timeoutID = null
+  }
+  push(data) {
+    this.data.push({ timestamp: Date.now(), data: data })
+    if (!this.activated) {
+      this.activated = true
+      this.timeoutID = setTimeout(this.check.bind(this), this.window)
+    } else {
+      clearTimeout(this.timeoutID)
+      this.timeoutID = setTimeout(this.check.bind(this), this.window)
+    }
+  }
+  check() {
+    this.callback(this.data.splice(0, this.data.length))
+    this.activated = false
   }
 }
 module.exports = (RED) => {
@@ -135,6 +170,13 @@ module.exports = (RED) => {
             cb
           )
           break
+        case "session-time":
+          this.window = new SessionTime(
+            config.sessionTimeSize,
+            config.sessionTimeUnit,
+            cb
+          )
+          break
         default:
           throw Error(
             "unknown mode: " + config.mode + ", element: " + config.element
@@ -147,6 +189,10 @@ module.exports = (RED) => {
     this.on("input", (msg) => {
       if (this.window != null) this.window.push(msg.payload)
     })
+
+    this.stop = function () {
+      if (this.window != null) this.window.stop()
+    }
   }
   RED.nodes.registerType("window", buildNode)
 }

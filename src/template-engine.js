@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true })
 class TemplateEngine {
   constructor(template, leftDelimiter, rightDelimiter) {
     this.template = template
-    this.pattern = new RegExp(leftDelimiter + "(.+?)" + rightDelimiter, "g")
+    this.pattern = new RegExp(leftDelimiter + "(.*?)" + rightDelimiter, "g")
     this.valueMap = new Map()
     this.replaceMap = new Map()
     let result
