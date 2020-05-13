@@ -413,7 +413,7 @@ function genData(type, node) {
     let values = Array();
     var default_data;
     for (let i = 0; i < node.data.length; ++i) {
-        values.push(node.data[i]);
+        values.push(JSON.parse(JSON.stringify(node.data[i])));
     }
     if (type == "Bar chart") {
         default_data = {
@@ -478,7 +478,6 @@ function genData(type, node) {
         }
         default_data = [default_data];
     }
-    // console.log(default_data);
     return default_data;
 }
 function genJson(node) {
