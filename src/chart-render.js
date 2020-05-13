@@ -478,6 +478,7 @@ function genData(type, node) {
         }
         default_data = [default_data];
     }
+    // console.log(default_data);
     return default_data;
 }
 function genJson(node) {
@@ -569,43 +570,43 @@ function addData(msg, node) {
         }
     } else {
         var data_arr = {x: Array(), y: Array(), format: Array() };
-        if (typeof(msg.x) == "number") {
+        if (typeof(msg.y) == "number") {
             data_arr.x.push(msg.x);
             data_arr.y.push(msg.y);
             data_arr.format.push(msg.format);
-        } else if (msg.x.constructor == Array) {
+        } else if (msg.y.constructor == Array) {
             data_arr.x = msg.x;
             data_arr.y = msg.y;
             data_arr.format = msg.format;
         } else {
-            throw {message: "data must be number or Array, not " + msg.x.constructor};
+            throw {message: "data must be number or Array, not " + msg.y.constructor};
         }
 
-        for (let i = 0; i < data_arr.length; ++i) {
+        for (let i = 0; i < data_arr.x.length; ++i) {
             if (node.chartType == "Bar chart") {
-                data_json = { category: msg.x[i], amount: msg.y[i] };
-                if (msg.format != null) {
-                    node.format_str = { parse: { category: msg.format[i] } };
+                data_json = { category: data_arr.x[i], amount: data_arr.y[i] };
+                if (data_arr.format != null) {
+                    node.format_str = { parse: { category: data_arr.format[i] } };
                 }
             } else if (type == "Line chart") {
-                data_json = { x: msg.x[i], y: msg.y[i], c: 0 };
-                if (msg.format[i] != null) {
-                    node.format_str = { parse: { x: msg.format[i] } };
+                data_json = { x: data_arr.x[i], y: data_arr.y[i], c: 0 };
+                if (data_arr.format != null) {
+                    node.format_str = { parse: { x: data_arr.format[i] } };
                 }
             } else if (type == "Pie chart") {
-                data_json = { id: msg.x[i], field: msg.y[i] }
-                if (msg.format[i] != null) {
-                    node.format_str = { parse: { id: msg.format[i] } };
+                data_json = { id: data_arr.x[i], field: data_arr.y[i] }
+                if (data_arr.format != null) {
+                    node.format_str = { parse: { id: data_arr.format[i] } };
                 }
             } else if (type == "Radar chart") {
-                data_json = { key: msg.x[i], value: msg.y[i], category: 0 }
-                if (msg.format[i] != null) {
-                    node.format_str = { parse: { key: msg.format[i] } };
+                data_json = { key: data_arr.x[i], value: data_arr.y[i], category: 0 }
+                if (data_arr.format != null) {
+                    node.format_str = { parse: { key: data_arr.format[i] } };
                 }
             } else if (type == "Polar area chart") {
-                data_json = msg.y[i];
-                if (msg.format[i] != null) {
-                    node.format_str = { parse: { key: msg.format[i] } };
+                data_json = data_arr.y[i];
+                if (data_arr.format != null) {
+                    node.format_str = { parse: { key: data_arr.format[i] } };
                 }
             }
             node.data.push(data_json);
@@ -641,7 +642,7 @@ module.exports = (RED) => {
                     for (let i = 0; i < keys.length; ++i) {
                         let key = keys[i];
                         if (require_keys.indexOf(key) > -1) {
-                            console.log("update: " + key);
+                            // console.log("update: " + key);
                             node[key] = msg.config[key];
                         }
                     }
@@ -668,6 +669,7 @@ module.exports = (RED) => {
                     node.send(msg);
                 });
             } catch (err) {
+                // console.log(err.message);
                 node.error(err.message, msg);
             }
         });
