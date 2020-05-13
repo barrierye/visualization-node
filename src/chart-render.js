@@ -664,7 +664,7 @@ module.exports = (RED) => {
                     } else {
                         msg.payload = Buffer.from(base64_str, 'base64');
                     }
-                        console.log(msg.payload);
+                    // console.log(msg.payload);
                     node.send(msg);
                 });
             } catch (err) {
