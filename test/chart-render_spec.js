@@ -596,7 +596,7 @@ describe('chart-render Node', function () {
  
 
 
-  it("should return line chart with defined width and height", function (done) {
+  it("should return chart with defined width and height", function (done) {
     const flow = [
       {
         id: "n1",
@@ -632,7 +632,7 @@ describe('chart-render Node', function () {
   })
 
 
-  it("should return shift data in data-window", function (done) {
+  it("should shift data in data-window", function (done) {
     const flow = [
       {
         id: "n1",
@@ -677,7 +677,7 @@ describe('chart-render Node', function () {
   })
 
 
-  it("should return line chart with defined config in message", function (done) {
+  it("should return chart with defined config in message", function (done) {
     const flow = [
       {
         id: "n1",
@@ -725,7 +725,7 @@ describe('chart-render Node', function () {
   })
 
 
-  it("should return line chart with defined config in message (but config is empty)", function (done) {
+  it("should return chart with defined config in message (but config is empty)", function (done) {
     const flow = [
       {
         id: "n1",
@@ -765,7 +765,7 @@ describe('chart-render Node', function () {
 
 
 
-  it("should return line chart with binary format", function (done) {
+  it("should return chart with binary format", function (done) {
     const flow = [
       {
         id: "n1",
