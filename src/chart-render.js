@@ -569,6 +569,7 @@ function addData(msg, node) {
             node.data.push(data_json);
         }
     } else {
+        node.data = new Array();
         var data_arr = {x: Array(), y: Array(), format: Array() };
         if (typeof(msg.y) == "number") {
             data_arr.x.push(msg.x);
