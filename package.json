@@ -9,7 +9,7 @@
     "watch": "tsc -watch",
     "prestart": "tsc",
     "prepublish": "npm run build",
-    "test": "mocha \"test/*_spec.js\""
+    "test": "nyc mocha"
   },
   "author": "barriery",
   "license": "Apache-2.0",
