@@ -24,14 +24,17 @@
     }
   },
   "dependencies": {
+    "canvas": "^2.6.1",
+    "i18next": "^19.4.4",
+    "nise": "^4.0.3",
     "os-utils": "^0.0.14",
-    "vega": "^5.11.1",
-    "canvas": "^2.6.1"
+    "vega": "^5.11.1"
   },
   "devDependencies": {
     "mocha": "^7.1.2",
     "node-red": "^1.0.6",
     "node-red-node-test-helper": "^0.2.3",
-    "nyc": "^15.0.1"
+    "nyc": "^15.0.1",
+    "chai": "^4.2.0"
   }
 }

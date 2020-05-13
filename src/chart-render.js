@@ -634,7 +634,19 @@ module.exports = (RED) => {
         var fs = require("fs");
         node.on("input", function (msg) {
             try {
-                addData(msg, node)
+                if (msg.config != null) {
+                    let require_keys = ["chartType", "title", "xLabel", 
+                        "yLabel", "dataWindow", "output", "height", "width"];
+                    let keys = Object.keys(msg.config);
+                    for (let i = 0; i < keys.length; ++i) {
+                        let key = keys[i];
+                        if (require_keys.indexOf(key) > -1) {
+                            console.log("update: " + key);
+                            node[key] = msg.config[key];
+                        }
+                    }
+                }
+                addData(msg, node);
 
                 var spec = genJson(node);
                 // console.log(spec);
@@ -652,6 +664,7 @@ module.exports = (RED) => {
                     } else {
                         msg.payload = Buffer.from(base64_str, 'base64');
                     }
+                        console.log(msg.payload);
                     node.send(msg);
                 });
             } catch (err) {
