@@ -21,7 +21,7 @@
     </label>
     <select id="node-input-element">
       <option value="time">Time</option>
-      <option value="point">Data Point</option>
+      <option value="point" id="data-point-option">Data Point</option>
     </select>
   </div>
   <div class="form-row option-display" id="tumbling-time-size" style="display: none">
@@ -62,6 +62,19 @@
     </label>
     <input type="text" id="node-input-slidingPointSlide" style="width: 80px">
   </div>
+  <div class="form-row option-display" id="session-time-size" style="display: none">
+    <label for="node-input-sessionTimeSize">
+      <i class="icon-tag"></i> 会话间隔
+    </label>
+    <input type="text" id="node-input-sessionTimeUnit" style="width: 50px">
+    <select id="node-input-sessionTimeUnit" style="width: 80px">
+      <option value="1">Second</option>
+      <option value="60">Minute</option>
+      <option value="3600">Hour</option>
+      <option value="86400">Day</option>
+      <option value="604800">Week</option>
+    </select>
+  </div>
 </script>
 
 <script type="text/html" data-help-name="window">
@@ -80,11 +93,13 @@
       mode: { value: "tumbling", require: true },
       element: { value: "time", require: true },
       tumblingTimeSize: { value: 1, validate: RED.validators.number() },
-      tumblingTimeUnit: { value: "3600" },
+      tumblingTimeUnit: { value: "60" },
       tumblingPointSize: { value: 100, validate: RED.validators.number() },
       slidingTimeSlide: { value: 1, validate: RED.validators.number() },
-      slidingTimeSlideUnit: { value: "3600" },
-      slidingPointSlide: { value: 100, validate: RED.validators.number() }
+      slidingTimeSlideUnit: { value: "60" },
+      slidingPointSlide: { value: 100, validate: RED.validators.number() },
+      sessionTimeSize: { value: 1, validate: RED.validators.number() },
+      sessionTimeUnit: { value: "60" },
     },
     inputs: 1,
     outputs: 1,
@@ -109,21 +124,31 @@
               $("#sliding-point-slide").show()
             }
           }
+        } else if (mode === "session") {
+          $("session-time-size").show()
         }
+      }
+      function disable(mode) {
+        if (mode === "session")
+          $("data-point-option").attr("disabled", "disabled")
+        else
+          $("data-point-option").removeAttr("disabled")
       }
       $("#node-input-mode").on("change", function () {
         mode = $(this).val()
         element = $("#node-input-element").val()
-        console.log(mode, element)
+        // console.log(mode, element)
         display(mode, element)
+        disable(mode)
       })
       $("#node-input-element").on("change", function () {
         mode = $("#node-input-mode").val()
         element = $(this).val()
-        console.log(mode, element)
+        // console.log(mode, element)
         display(mode, element)
       })
       display(node.mode, node.element)
+      disable(mode)
     }
   })
 </script>
