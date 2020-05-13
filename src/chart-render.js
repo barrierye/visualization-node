@@ -547,7 +547,7 @@ function addData(msg, node) {
 
         if (typeof(data) == "number") {
             data_arr.push(data);
-        } else if (data.constructor == Array) {
+        } else if (data.constructor == Array || data.constructor == "function Array() { [native code] }") {
             data_arr = data;
         } else {
             throw {message: "data must be number or Array, not " + data.constructor};
@@ -574,7 +574,7 @@ function addData(msg, node) {
             data_arr.x.push(msg.x);
             data_arr.y.push(msg.y);
             data_arr.format.push(msg.format);
-        } else if (msg.y.constructor == Array) {
+        } else if (msg.y.constructor == Array || msg.y.constructor == "function Array() { [native code] }") {
             data_arr.x = msg.x;
             data_arr.y = msg.y;
             data_arr.format = msg.format;
