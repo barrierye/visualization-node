@@ -4,12 +4,12 @@
   "description": "visualization node for Node-RED",
   "main": "index.js",
   "scripts": {
-    "build": "cp -a src/*.html dist/ && cp src/*.js dist/",
+    "build": "mkdir dist cp -a src/*.html dist/ && cp src/*.js dist/",
     "start": "node index.js",
     "watch": "tsc -watch",
     "prestart": "tsc",
     "prepublish": "npm run build",
-    "test": "nyc mocha"
+    "test": "mkdir output && nyc mocha"
   },
   "author": "barriery",
   "license": "Apache-2.0",
