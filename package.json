@@ -4,12 +4,15 @@
   "description": "visualization node for Node-RED",
   "main": "index.js",
   "scripts": {
-    "build": "mkdir dist cp -a src/*.html dist/ && cp src/*.js dist/",
+    "build": "mkdir -p dist && cp -a src/*.html dist/ && cp src/*.js dist/",
     "start": "node index.js",
-    "watch": "tsc -watch",
+    "watch": "npm-watch",
     "prestart": "tsc",
     "prepublish": "npm run build",
     "test": "mkdir output && nyc mocha"
+  },
+  "watch": {
+    "build": "src/*.*"
   },
   "author": "barriery",
   "license": "Apache-2.0",
@@ -20,13 +23,16 @@
       "field-join": "dist/field-join.js",
       "cpu-usage": "dist/cpu-usage.js",
       "mem-usage": "dist/mem-usage.js",
-      "window": "dist/window.js"
+      "window": "dist/window.js",
+      "feishu-split": "dist/feishu-split.js"
     }
   },
   "dependencies": {
+    "buffer-image-size": "^0.6.4",
     "canvas": "^2.6.1",
     "i18next": "^19.4.4",
     "nise": "^4.0.3",
+    "npm-watch": "^0.6.0",
     "os-utils": "^0.0.14",
     "vega": "^5.11.1"
   },
