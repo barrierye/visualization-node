@@ -35,7 +35,7 @@ describe("window", function () {
       try {
         const n1 = helper.getNode("n1")
         n1.receive({})
-        n1.error.should.be.called()
+        n1.error.should.be.calledWithMatch("unknown mode:")
         done()
       } catch (error) {
         done(error)
